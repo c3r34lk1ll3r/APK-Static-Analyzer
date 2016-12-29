@@ -16,6 +16,8 @@ class BytetoFile:
 		return byte
 	def seek(self,qty):
 		self.start=qty
+	def tell(self):
+		return self.start
 
 class ListWindow(QtGui.QMainWindow, list.Ui_MainWindow):
 

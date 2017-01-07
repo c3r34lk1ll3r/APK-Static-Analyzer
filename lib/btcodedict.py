@@ -7,7 +7,7 @@ class ByteCodeDictionary:
 		self.dict[0x03]="move/16"
 		self.dict[0x04]="move-wide"
 		self.dict[0x05]="move-wide/from16"
-		self.dict[0x06]="move-wiide/16"
+		self.dict[0x06]="move-wide/16"
 		self.dict[0x07]="move-object"
 		self.dict[0x08]="move-object/from16"
 		self.dict[0x09]="move-object/16"
@@ -282,10 +282,27 @@ class ByteCodeDictionary:
 		#6  VA 8 bits, signed int 16 bits
 		#7  VA 8 bits, signed int 32 bits
 		#8  VA 8 bits, signed int 64 bits
-		#9  VA 8 bits, index string 16 bits
-		#10 VA 8 bits, index string 32 bits
-		#11 VA 8 bits, type string 32 bits
+		#9  VA 8 bits, string index 16 bits
+		#10 VA 8 bits, string index 32 bits
+		#11 VA 8 bits, type index 16 bits
 		#12 VA 4 bits, VB 4 bits, type index 16 bits
+		#13 VA 4 bits MSB operator word counts, VB 16 bits method index, VC VD VE VF 4 bits each -> FILLED NEW ARRAY
+		#14 signed brach 8 bits
+		#15 signed brach 16 bits
+		#16 signed brach 32 bits
+		#17 VA 8 bits, VB 32 bits
+		#18 VA 8 bits, VB 8 bits, VC 8 bits
+		#19 VA 4 bits, VB 4 bits, signed branch 16 bits
+		#20 VA 8 bits, signed branch 16 bits
+		#21 VA 8 bits, VB 8 bits, VC 8 bits
+		#22 VA 4 bits, VB 4 bits, field index 16 bits
+		#23 VA 8 bits, field index 16 bits
+		#24 VA 4 bits, VB 16 bits method index, VC VD VE 4 bits each -> INVOKE
+		#25 VA 8 bits, VB 16 bits method index, VC 16 bits -> INVOKE
+		#26 VA 8 bits, VB 8 bits, signed integer 8 bits
+		#27 VA 8 bits, branch 32 bits, sparse-switch
+		#28 VA 8 bits, VB 16 bits method index, VC 16 bits -> filled-new-array/range
+		
 		
 		self.oper={}
 		self.oper[0x00]=0
@@ -321,42 +338,20 @@ class ByteCodeDictionary:
 		self.oper[0x1D]=4
 		self.oper[0x1E]=4
 		self.oper[0x1F]=11
-
-		#0  NO operator
-		#1  VA 4 bits, VB 4 bits
-		#2  VA 8 bits, VB 16 bits
-		#3  VA 16 bits, VB 16 bits
-		#4  VA 8 bits
-		#5  VA 4 bits, signed int 4 bits
-		#6  VA 8 bits, signed int 16 bits
-		#7  VA 8 bits, signed int 32 bits
-		#8  VA 8 bits, signed int 64 bits
-		#9  VA 8 bits, string index 16 bits
-		#10 VA 8 bits, string index 32 bits
-		#11 VA 8 bits, type index 16 bits
-		#12 VA 4 bits, VB 4 bits, type index 16 bits
-		#13 FILLED NEW ARRAY -> TO IMPLEMENTS
-		#14 signed brach 8 bits
-		#15 signed brach 16 bits
-		#16 signed brach 32 bits
-		#17 VA 8 bits, VB 32 bits
-		#18 VA 8 bits, VB 8 bits, VC 8 bits
-		#19 VA 4 bits, VB 4 bits, signed branch 16 bits
-		#20 VA 8 bits, signed branch 16 bits
 		
 		self.oper[0x20]=12
 		self.oper[0x21]=1
 		self.oper[0x22]=11
 		self.oper[0x23]=12
 		self.oper[0x24]=13
-		self.oper[0x25]=13
-		self.oper[0x26]=26
+		self.oper[0x25]=28
+		self.oper[0x26]=27
 		self.oper[0x27]=4
 		self.oper[0x28]=14
 		self.oper[0x29]=15
 		self.oper[0x2A]=16
 		self.oper[0x2B]=17
-		self.oper[0x2C]=17
+		self.oper[0x2C]=27
 		self.oper[0x2D]=18
 		self.oper[0x2E]=18
 		self.oper[0x2F]=18
@@ -377,31 +372,6 @@ class ByteCodeDictionary:
 		self.oper[0x3D]=20
 		self.oper[0x3E]=0
 		self.oper[0x3F]=0
-		
-		#0  NO operator
-		#1  VA 4 bits, VB 4 bits
-		#2  VA 8 bits, VB 16 bits
-		#3  VA 16 bits, VB 16 bits
-		#4  VA 8 bits
-		#5  VA 4 bits, signed int 4 bits
-		#6  VA 8 bits, signed int 16 bits
-		#7  VA 8 bits, signed int 32 bits
-		#8  VA 8 bits, signed int 64 bits
-		#9  VA 8 bits, string index 16 bits
-		#10 VA 8 bits, string index 32 bits
-		#11 VA 8 bits, type index 16 bits
-		#12 VA 4 bits, VB 4 bits, type index 16 bits
-		#13 FILLED NEW ARRAY -> TO IMPLEMENTS
-		#14 signed brach 8 bits
-		#15 signed brach 16 bits
-		#16 signed brach 32 bits
-		#17 VA 8 bits, VB 32 bits
-		#18 VA 8 bits, VB 8 bits, VC 8 bits
-		#19 VA 4 bits, VB 4 bits, signed branch 16 bits
-		#20 VA 8 bits, signed branch 16 bits
-		#21 VA 8 bits, VB 8 bits, VC 8 bits
-		#22 VA 4 bits, VB 4 bits, field index 16 bits
-		#23 VA 8 bits, field index 16 bits
 		
 		self.oper[0x40]=0
 		self.oper[0x41]=0
@@ -454,154 +424,128 @@ class ByteCodeDictionary:
 		self.oper[0x6E]=24
 		self.oper[0x6F]=24
 		
-		#0  NO operator
-		#1  VA 4 bits, VB 4 bits
-		#2  VA 8 bits, VB 16 bits
-		#3  VA 16 bits, VB 16 bits
-		#4  VA 8 bits
-		#5  VA 4 bits, signed int 4 bits
-		#6  VA 8 bits, signed int 16 bits
-		#7  VA 8 bits, signed int 32 bits
-		#8  VA 8 bits, signed int 64 bits
-		#9  VA 8 bits, string index 16 bits
-		#10 VA 8 bits, string index 32 bits
-		#11 VA 8 bits, type index 16 bits
-		#12 VA 4 bits, VB 4 bits, type index 16 bits
-		#13 FILLED NEW ARRAY -> TO IMPLEMENTS
-		#14 signed brach 8 bits
-		#15 signed brach 16 bits
-		#16 signed brach 32 bits
-		#17 VA 8 bits, VB 32 bits
-		#18 VA 8 bits, VB 8 bits, VC 8 bits
-		#19 VA 4 bits, VB 4 bits, signed branch 16 bits
-		#20 VA 8 bits, signed branch 16 bits
-		#21 VA 8 bits, VB 8 bits, VC 8 bits
-		#22 VA 4 bits, VB 4 bits, field index 16 bits
-		#23 VA 8 bits, field index 16 bits
-		#24 VA 4 bits, VB 16 bits, VC VD VE 4 bits each -> INVOKE
-		
 		self.oper[0x70]=24
 		self.oper[0x71]=24
 		self.oper[0x72]=24
 		self.oper[0x73]=24
-		self.oper[0x74]="invoke-virtual/range"
-		self.oper[0x75]="invoke-super/range"
-		self.oper[0x76]="invoke-direct/range"
-		self.oper[0x77]="invoke-static/range"
-		self.oper[0x78]="invoke-interface-range"
+		self.oper[0x74]=25
+		self.oper[0x75]=25
+		self.oper[0x76]=25
+		self.oper[0x77]=25
+		self.oper[0x78]=25
 		self.oper[0x79]=0
 		self.oper[0x7A]=0
-		self.oper[0x7B]="neg-int"
-		self.oper[0x7C]="not-int"
-		self.oper[0x7D]="neg-long"
-		self.oper[0x7E]="not-long"
-		self.oper[0x7F]="neg-float"
+		self.oper[0x7B]=1
+		self.oper[0x7C]=1
+		self.oper[0x7D]=1
+		self.oper[0x7E]=1
+		self.oper[0x7F]=1
 
-		self.oper[0x80]="neg-double"
-		self.oper[0x81]="int-to-long"
-		self.oper[0x82]="int-to-float"
-		self.oper[0x83]="int-to-double"
-		self.oper[0x84]="long-to-int"
-		self.oper[0x85]="long-to-float"
-		self.oper[0x86]="long-to-double"
-		self.oper[0x87]="float-to-int"
-		self.oper[0x88]="float-to-long"
-		self.oper[0x89]="float-to-double"
-		self.oper[0x8A]="double-to-int"
-		self.oper[0x8B]="double-to-long"
-		self.oper[0x8C]="double-to-float"
-		self.oper[0x8D]="int-to-byte"
-		self.oper[0x8E]="int-to-char"
-		self.oper[0x8F]="int-to-short"
-
-		self.oper[0x90]="add-int"
-		self.oper[0x91]="sub-int"
-		self.oper[0x92]="mul-int"
-		self.oper[0x93]="div-int"
-		self.oper[0x94]="rem-int"
-		self.oper[0x95]="add-int"
-		self.oper[0x96]="or-int"
-		self.oper[0x97]="xor-int"
-		self.oper[0x98]="shl-int"
-		self.oper[0x99]="shr-int"
-		self.oper[0x9A]="ushr-int"
-		self.oper[0x9B]="add-long"
-		self.oper[0x9C]="sub-long"
-		self.oper[0x9D]="mul-long"
-		self.oper[0x9E]="div-long"
-		self.oper[0x9F]="rem-long"
+		self.oper[0x80]=1
+		self.oper[0x81]=1
+		self.oper[0x82]=1
+		self.oper[0x83]=1
+		self.oper[0x84]=1
+		self.oper[0x85]=1
+		self.oper[0x86]=1
+		self.oper[0x87]=1
+		self.oper[0x88]=1
+		self.oper[0x89]=1
+		self.oper[0x8A]=1
+		self.oper[0x8B]=1
+		self.oper[0x8C]=1
+		self.oper[0x8D]=1
+		self.oper[0x8E]=1
+		self.oper[0x8F]=1
 		
-		self.oper[0xA0]="and-long"
-		self.oper[0xA1]="or-long"
-		self.oper[0xA2]="xor-long"
-		self.oper[0xA3]="shl-long"
-		self.oper[0xA4]="shr-long"
-		self.oper[0xA5]="ushr-long"
-		self.oper[0xA6]="add-float"
-		self.oper[0xA7]="sub-float"
-		self.oper[0xA8]="mul-float"
-		self.oper[0xA9]="div-float"
-		self.oper[0xAA]="rem-float"
-		self.oper[0xAB]="add-double"
-		self.oper[0xAC]="sub-double"
-		self.oper[0xAD]="mul-double"
-		self.oper[0xAE]="div-double"
-		self.oper[0xAF]="rem-double"
+		self.oper[0x90]=18
+		self.oper[0x91]=18
+		self.oper[0x92]=18
+		self.oper[0x93]=18
+		self.oper[0x94]=18
+		self.oper[0x95]=18
+		self.oper[0x96]=18
+		self.oper[0x97]=18
+		self.oper[0x98]=18
+		self.oper[0x99]=18
+		self.oper[0x9A]=18
+		self.oper[0x9B]=18
+		self.oper[0x9C]=18
+		self.oper[0x9D]=18
+		self.oper[0x9E]=18
+		self.oper[0x9F]=18
+		
+		self.oper[0xA0]=18
+		self.oper[0xA1]=18
+		self.oper[0xA2]=18
+		self.oper[0xA3]=18
+		self.oper[0xA4]=18
+		self.oper[0xA5]=18
+		self.oper[0xA6]=18
+		self.oper[0xA7]=18
+		self.oper[0xA8]=18
+		self.oper[0xA9]=18
+		self.oper[0xAA]=18
+		self.oper[0xAB]=18
+		self.oper[0xAC]=18
+		self.oper[0xAD]=18
+		self.oper[0xAE]=18
+		self.oper[0xAF]=18
 
-		self.oper[0xB0]="add-int/2addr"
-		self.oper[0xB1]="sub-int/2addr"
-		self.oper[0xB2]="mul-int/2addr"
-		self.oper[0xB3]="div-int/2addr"
-		self.oper[0xB4]="rem-int/2addr"
-		self.oper[0xB5]="add-int/2addr"
-		self.oper[0xB6]="or-int/2addr"
-		self.oper[0xB7]="xor-int/2addr"
-		self.oper[0xB8]="shl-int/2addr"
-		self.oper[0xB9]="shr-int/2addr"
-		self.oper[0xBA]="ushr-int/2addr"
-		self.oper[0xBB]="add-long/2addr"
-		self.oper[0xBC]="sub-long/2addr"
-		self.oper[0xBD]="mul-long/2addr"
-		self.oper[0xBE]="div-long/2addr"
-		self.oper[0xBF]="rem-long/2addr"
+		self.oper[0xB0]=1
+		self.oper[0xB1]=1
+		self.oper[0xB2]=1
+		self.oper[0xB3]=1
+		self.oper[0xB4]=1
+		self.oper[0xB5]=1
+		self.oper[0xB6]=1
+		self.oper[0xB7]=1
+		self.oper[0xB8]=1
+		self.oper[0xB9]=1
+		self.oper[0xBA]=1
+		self.oper[0xBB]=1
+		self.oper[0xBC]=1
+		self.oper[0xBD]=1
+		self.oper[0xBE]=1
+		self.oper[0xBF]=1
 
-		self.oper[0xC0]="and-long/2addr"
-		self.oper[0xC1]="or-long/2addr"
-		self.oper[0xC2]="xor-long/2addr"
-		self.oper[0xC3]="shl-long/2addr"
-		self.oper[0xC4]="shr-long/2addr"
-		self.oper[0xC5]="ushr-long/2addr"
-		self.oper[0xC6]="add-float/2addr"
-		self.oper[0xC7]="sub-float/2addr"
-		self.oper[0xC8]="mul-float/2addr"
-		self.oper[0xC9]="div-float/2addr"
-		self.oper[0xCA]="rem-float/2addr"
-		self.oper[0xCB]="add-double/2addr"
-		self.oper[0xCC]="sub-double/2addr"
-		self.oper[0xCD]="mul-double/2addr"
-		self.oper[0xCE]="div-double/2addr"
-		self.oper[0xCF]="rem-double/2addr"
+		self.oper[0xC0]=1
+		self.oper[0xC1]=1
+		self.oper[0xC2]=1
+		self.oper[0xC3]=1
+		self.oper[0xC4]=1
+		self.oper[0xC5]=1
+		self.oper[0xC6]=1
+		self.oper[0xC7]=1
+		self.oper[0xC8]=1
+		self.oper[0xC9]=1
+		self.oper[0xCA]=1
+		self.oper[0xCB]=1
+		self.oper[0xCC]=1
+		self.oper[0xCD]=1
+		self.oper[0xCE]=1
+		self.oper[0xCF]=1
  
-		self.oper[0xD0]="add-int/lit16"
-		self.oper[0xD1]="sub-int/lit16"
-		self.oper[0xD2]="mul-int/lit16"
-		self.oper[0xD3]="div-int/lit16"
-		self.oper[0xD4]="rem-int/lit16"
-		self.oper[0xD5]="and-int/lit16"
-		self.oper[0xD6]="or-int/lit16"
-		self.oper[0xD7]="xor-int/lit16"
-		self.oper[0xD8]="add-int/lit8"
-		self.oper[0xD9]="sub-int/lit8"
-		self.oper[0xDA]="mul-int/lit8"
-		self.oper[0xDB]="div-int/lit8"
-		self.oper[0xDC]="rem-int/lit8"
-		self.oper[0xDD]="and-int/lit8"
-		self.oper[0xDE]="or-int/lit8"
-		self.oper[0xDF]="xor-int/lit8"
+		self.oper[0xD0]=19
+		self.oper[0xD1]=19
+		self.oper[0xD2]=19
+		self.oper[0xD3]=19
+		self.oper[0xD4]=19
+		self.oper[0xD5]=19
+		self.oper[0xD6]=19
+		self.oper[0xD7]=19
+		self.oper[0xD8]=26
+		self.oper[0xD9]=26
+		self.oper[0xDA]=26
+		self.oper[0xDB]=26
+		self.oper[0xDC]=26
+		self.oper[0xDD]=26
+		self.oper[0xDE]=26
+		self.oper[0xDF]=26
 
-		self.oper[0xE0]="shl-int/lit8"
-		self.oper[0xE1]="shr-int/lit8"
-		self.oper[0xE2]="ushr-int/lit8"
+		self.oper[0xE0]=26
+		self.oper[0xE1]=26
+		self.oper[0xE2]=26
 		self.oper[0xE3]=0
 		self.oper[0xE4]=0
 		self.oper[0xE5]=0

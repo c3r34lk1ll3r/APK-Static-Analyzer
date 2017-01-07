@@ -61,10 +61,11 @@ class MainWindow(QtGui.QMainWindow, window.Ui_MainWindow):
 		self.tabt=[]
 		
 		self.textBrowser=[]
+		
 	def addTextBrowserTab(self,name):
 		self.tabt.append(QtGui.QWidget())
 		self.tabt[-1].setObjectName("tab_"+name)
-		self.textBrowser.append(QtGui.QTextBrowser(self.tabt[-1]))
+		self.textBrowser.append(QtGui.QTextEdit(self.tabt[-1]))
 		self.textBrowser[-1].setGeometry(QtCore.QRect(0, 0, 671, 771))
 		self.textBrowser[-1].setObjectName("text"+name)
 		self.tabWidget.addTab(self.tabt[-1], name)
@@ -101,8 +102,10 @@ class MainWindow(QtGui.QMainWindow, window.Ui_MainWindow):
 		print self.clx[class_name]
 		sx=self.dx.printClass(self.clx[class_name])
 		self.addTextBrowserTab(class_name)
+		br=self.textBrowser[-1]
 		for l in sx:
-			self.textBrowser[-1].insertPlainText(l)
+			br.insertPlainText(l)
+			#self.textBrowser[-1].setHtml(l)
 		
 		
 	def fileModel_clicked(self):

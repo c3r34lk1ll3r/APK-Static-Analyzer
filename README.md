@@ -11,7 +11,7 @@ This tool allow to perform reverse engineering activity for APK files show vario
 Step to use APK Static Analyzer:
 
 1. Install all requirements
-3. Run `cli.py` (for command line interface) or `gui.py` (for GUI [NOT YET IMPLEMENTED])
+3. Run `python cli.py` (for command line interface) or `python gui.py` (for GUI [NOT YET IMPLEMENTED])
 
 ## Usage
 

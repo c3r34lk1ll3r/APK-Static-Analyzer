@@ -17,13 +17,13 @@ Step to use APK Static Analyzer:
 
 In order to execute the tool run:
 
-`cli.py`
+`python cli.py`
 
 This command open a interactive shell using IPython.
 
 The step to load an apk are:
 ```
-1. cli.py
+1. python cli.py
 2. a=APK('<apkfile.apk>')
 3. dex=a.Dex()
 4. d=DexFile(dex[0])

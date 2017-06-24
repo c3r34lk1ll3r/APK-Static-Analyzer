@@ -1,3 +1,6 @@
+from .bgcolors import bcolors
+import binascii
+
 class Header:
 	def __init__(self):
 		self.MagicNumber=0x0 	#ubyte[8]
@@ -23,12 +26,41 @@ class Header:
 		self.class_defs_off=0 	#uint
 		self.data_size=0 		#uint
 		self.data_off=0 		#uint
-	
+	def __str__(self):
+		ret=""
+		ret+="Magic Number:\t\t"+bcolors.ENDC+"0x"+binascii.hexlify(self.MagicNumber[0:4])+"\t["+self.MagicNumber[0:3]+"]\n"
+		ret+=bcolors.BOLD+"DEX Version:\t\t"+bcolors.ENDC+"0x"+binascii.hexlify(self.MagicNumber[4:8])+"\t["+self.MagicNumber[4:7]+"]\n"
+		ret+=bcolors.BOLD+"Checksum:\t\t"+bcolors.ENDC+"0x"+binascii.hexlify(self.checksum)+"\n"
+		ret+=bcolors.BOLD+"Signature:\t\t"+bcolors.ENDC+"0x"+binascii.hexlify(self.signature)+"\n"
+		ret+=bcolors.BOLD+"File size:\t\t"+bcolors.ENDC+str(self.file_size)+"\n"
+		ret+=bcolors.BOLD+"Header size:\t\t"+bcolors.ENDC+str(self.header_size)+"\n"
+		ret+=bcolors.BOLD+"Ordering byte:\t\t"+bcolors.ENDC+"0x"+binascii.hexlify(self.endian_tag)+"\n"
+		ret+=bcolors.BOLD+"Link size:\t\t"+bcolors.ENDC+str(self.link_size)+"\n"
+		ret+=bcolors.BOLD+"Link offset:\t\t"+bcolors.ENDC+str(self.link_off)+"\n"
+		ret+=bcolors.BOLD+"Map offset:\t\t"+bcolors.ENDC+str(self.map_off)+"\n"
+		ret+=bcolors.BOLD+"String IDS size:\t"+bcolors.ENDC+str(self.string_ids_size)+"\n"
+		ret+=bcolors.BOLD+"String IDS offset:\t"+bcolors.ENDC+str(self.string_ids_off)+"\n"
+		ret+=bcolors.BOLD+"Type IDS size:\t\t"+bcolors.ENDC+str(self.type_ids_size)+"\n"
+		ret+=bcolors.BOLD+"Type IDS offset:\t"+bcolors.ENDC+str(self.type_ids_off)+"\n"
+		ret+=bcolors.BOLD+"Proto IDS size:\t\t"+bcolors.ENDC+str(self.proto_ids_size)+"\n"
+		ret+=bcolors.BOLD+"Proto IDS offset:\t"+bcolors.ENDC+str(self.proto_ids_off)+"\n"
+		ret+=bcolors.BOLD+"Field IDS size:\t\t"+bcolors.ENDC+str(self.field_ids_size)+"\n"
+		ret+=bcolors.BOLD+"Field IDS offset:\t"+bcolors.ENDC+str(self.field_ids_off)+"\n"
+		ret+=bcolors.BOLD+"Method IDS size:\t"+bcolors.ENDC+str(self.method_ids_size)+"\n"
+		ret+=bcolors.BOLD+"Method IDS offset:\t"+bcolors.ENDC+str(self.method_ids_off)+"\n"
+		ret+=bcolors.BOLD+"Class DEFS size:\t"+bcolors.ENDC+str(self.class_defs_size)+"\n"
+		ret+=bcolors.BOLD+"Class DEFS offset:\t"+bcolors.ENDC+str(self.class_defs_off)+"\n"
+		ret+=bcolors.BOLD+"Data size:\t\t"+bcolors.ENDC+str(self.data_size)+"\n"
+		ret+=bcolors.BOLD+"Data offset:\t\t"+bcolors.ENDC+str(self.data_off)+"\n"
+		return str(ret)
+
 class StringIDS:
 	def __init__(self):
 		self.string_data_off=0
 		self.string_data_len=0
 		self.string_data_data=""
+	def __str__(self):
+		return (self.string_data_data)
 
 class CProtoIDS:
 	def __init__(self):
@@ -50,7 +82,7 @@ class CFieldIDS:
 		self.type_idx=0					#ushort	index into the type_ids list for the type of this field
 		self.name_idx=0					#uint	index into the string_ids list for the name of this field.
 										#The string must conform to the syntax for MemberName, defined above.
-		
+
 class CMethodIDS:
 	def __init__(self):
 		class_idx=0 					#ushort	index into the type_ids list for the definer of this method.
@@ -58,6 +90,7 @@ class CMethodIDS:
 		proto_idx=0						#ushort	index into the proto_ids list for the prototype of this method
 		name_idx=0						#uint	index into the string_ids list for the name of this method.
 										#The string must conform to the syntax for MemberName, defined above.
+
 class CClassDEF:
 	class class_data_item:
 		def __init__(self):
@@ -65,7 +98,7 @@ class CClassDEF:
 			self.instance_fields_size=0	#uleb128	the number of instance fields defined in this item
 			self.direct_methods_size=0	#uleb128	the number of direct methods defined in this item
 			self.virtual_methods_size=0	#uleb128	the number of virtual methods defined in this item
-		
+
 			self.static_fields=[]		#encoded_field[static_fields_size]	the defined static fields, represented as a sequence of encoded elements.
 										#The fields must be sorted by field_idx in increasing order.
 			self.instance_fields=[]		#encoded_field[instance_fields_size]	the defined instance fields, represented as a sequence
@@ -74,8 +107,8 @@ class CClassDEF:
 			self.virtual_methods=[]		#encoded_method[virtual_methods_size]
 
 			self.static_values=[]
-			
-				
+
+
 	class encoded_field:
 		def __init__(self):
 			self.field_idx_diff=0		#uleb128	index into the field_ids list for the identity of this field
@@ -83,11 +116,11 @@ class CClassDEF:
 										#			difference from the index of previous element in the list.
 										#			The index of the first element in a list is represented directly.
 			self.access_flags=0			#uleb128	access flags for the field (public, final, etc.). See "access_flags Definitions" for details.
-	
+
 	class encoded_method:
 		def __init__(self):
 			self.method_idx_diff=0		#uleb128	index into the method_ids list for the identity of this method
-										#			(includes the name and descriptor), represented as a difference 
+										#			(includes the name and descriptor), represented as a difference
 										#			from the index of previous element in the list.
 										#			The index of the first element in a list is represented directly.
 			self.access_flags=0			#uleb128	access flags for the method (public, final, etc.). See "access_flags Definitions" for details.
@@ -99,7 +132,7 @@ class CClassDEF:
 		def __init__(self):
 			self.size=0					#uleb128	number of elements in the array
 			self.values=[]				#Offset from the start of file where find the field
-	
+
 	class encoded_value:
 		def __init__(self):
 			self.value_arg=0			#ubyte	byte indicating the type of the immediately subsequent value along with an optional
@@ -111,7 +144,7 @@ class CClassDEF:
 										#for different value_type bytes, though always little-endian.
 		def __str__(self):
 			return str(self.value)
-	
+
 	class encoded_annotation:
 		def __init__(self):
 			self.type_idx=0				#uleb128	type of the annotation. This must be a class not array or primitive) type.
@@ -123,15 +156,15 @@ class CClassDEF:
 											#the string_ids section. The string must conform to the syntax for
 											#MemberName, defined above.
 											#value	encoded_value	element value
-		
+
 		def __str__(self):
 			return "ANNOTATION FOR NOW"
-			
-	
+
+
 	class code_item:
 		def __init__(self):
 			self.registers_size=0		#ushort	the number of registers used by this code
-			self.ins_size=0				#ushort	the number of words of incoming arguments to 
+			self.ins_size=0				#ushort	the number of words of incoming arguments to
 										#the method that this code is for
 			self.outs_size=0			#ushort	the number of words of outgoing argument space required by this code for method invocation
 			self.tries_size=0			#ushort	the number of try_items for this instance. If non-zero, then these appear as the tries
@@ -148,14 +181,14 @@ class CClassDEF:
 										#swapping is only done on individual ushorts and not on the larger internal structures.
 			self.padding=0				#ushort (optional) = 0	two bytes of padding to make tries four-byte aligned.
 										#This element is only present if tries_size is non-zero and insns_size is odd.
-			self.tries=0				#try_item[tries_size] (optional)	array indicating where in the code exceptions are caught and 
+			self.tries=0				#try_item[tries_size] (optional)	array indicating where in the code exceptions are caught and
 										#how to handle them. Elements of the array must be non-overlapping in range and in order from
 										#low to high address. This element is only present if tries_size is non-zero.
 			self.handlers=0				#encoded_catch_handler_list (optional)	bytes representing a list of lists of catch types and
 										#associated handler addresses. Each try_item has a byte-wise offset into this structure.
 										#This element is only present if tries_size is non-zero.
 	def __init__(self):
-		self.class_idx=0				#index into the type_ids list for this class. This must be a class type, and not 
+		self.class_idx=0				#index into the type_ids list for this class. This must be a class type, and not
 										#an array or primitive type.
 		self.access_flags=0				#access flags for the class (public, final, etc.). See "access_flags Definitions" for details.
 		self.superclass_idx=0			#index into the type_ids list for the superclass, or the constant value NO_INDEX if this class
@@ -186,7 +219,7 @@ class CClassDEF:
 										#the array than there are static fields, then the leftover fields are initialized with a
 										#type-appropriate 0 or null.
 		self.cdi=self.class_data_item()
-		self.read=False		
+		self.read=False
 		self.access_flagd={}
 		self.access_flagd[1]="public"
 		self.access_flagd[2]="private"
